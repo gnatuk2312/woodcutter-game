@@ -1,39 +1,40 @@
 import { FC, useCallback, useEffect, useState } from "react";
 
 import Wood from "./components/wood";
-import {
-  GAME_HEIGHT,
-  PLAYER_POSITION,
-  WOOD_HEIGHT,
-  WOOD_TYPE,
-} from "./common/common.constants";
-import { addNextWood, createRandomWood } from "./utils/common.utils";
-import { IWood } from "./interfaces/common.interface";
 import Player from "./components/player";
 import Score from "./components/score";
 import GameOver from "./components/game-over";
 import Timer from "./components/timer";
+import Level from "./components/level";
+import {
+  GAME_HEIGHT,
+  PLAYER_POSITION,
+  WOOD_TYPE,
+} from "./common/common.constants";
+import { addNextWood, generateWoodAtTheStart } from "./utils/common.utils";
+import { IWood } from "./interfaces/common.interface";
 
-const WOOD_COUNT = GAME_HEIGHT / WOOD_HEIGHT;
-
-const START_WOOD_ARRAY: IWood[] = [];
-// Crete basic wood array
-for (let i = 0; i <= WOOD_COUNT; i++) {
-  if (i === WOOD_COUNT || i % 2 === 0) {
-    START_WOOD_ARRAY.push({ id: Math.random(), woodType: WOOD_TYPE.NONE });
-  } else {
-    START_WOOD_ARRAY.push(createRandomWood());
-  }
-}
+const initialWoodArray = generateWoodAtTheStart();
 
 const App: FC = () => {
-  const [timer, setTimer] = useState(10000);
+  const [timer, setTimer] = useState<number>(10000);
   const [score, setScore] = useState<number>(0);
+  const [gameLevel, setGameLevel] = useState<number>(1);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [woodArray, setWoodArray] = useState<IWood[]>(START_WOOD_ARRAY);
+  const [woodArray, setWoodArray] = useState<IWood[]>(initialWoodArray);
   const [playerPosition, setPlayerPosition] = useState<
     keyof typeof PLAYER_POSITION
   >(PLAYER_POSITION.LEFT);
+
+  const gameOverAndReset = () => {
+    setGameOver(true);
+    setScore(0);
+    setTimer(10000);
+    setGameLevel(1);
+    setWoodArray(initialWoodArray);
+    setPlayerPosition(PLAYER_POSITION.LEFT);
+    return;
+  };
 
   const handleLeftGameClick = useCallback(() => {
     setPlayerPosition(PLAYER_POSITION.LEFT);
@@ -41,15 +42,11 @@ const App: FC = () => {
     setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
 
     if (woodArray[woodArray.length - 2].woodType === WOOD_TYPE.LEFT) {
-      setGameOver(true);
-      setScore(0);
-      setTimer(10000);
-      return;
+      gameOverAndReset();
     }
+    if (timer >= 10000) return;
+
     setScore((prev) => prev + 1);
-    if (timer >= 10000) {
-      return;
-    }
     setTimer((prev) => prev + 500);
   }, [woodArray, timer]);
 
@@ -59,15 +56,11 @@ const App: FC = () => {
     setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
 
     if (woodArray[woodArray.length - 2].woodType === WOOD_TYPE.RIGHT) {
-      setGameOver(true);
-      setScore(0);
-      setTimer(10000);
-      return;
+      gameOverAndReset();
     }
+    if (timer >= 10000) return;
+
     setScore((prev) => prev + 1);
-    if (timer >= 10000) {
-      return;
-    }
     setTimer((prev) => prev + 500);
   }, [woodArray, timer]);
 
@@ -81,8 +74,11 @@ const App: FC = () => {
       } else {
         handleRightGameClick();
       }
+      if (score / 10 > gameLevel) {
+        setGameLevel((prev) => prev + 1);
+      }
     },
-    [handleLeftGameClick, handleRightGameClick]
+    [handleLeftGameClick, handleRightGameClick, score, gameLevel]
   );
 
   if (timer <= 0) {
@@ -101,14 +97,14 @@ const App: FC = () => {
   useEffect(() => {
     if (!gameOver) {
       const interval = setInterval(() => {
-        setTimer((prev) => prev - 20);
+        setTimer((prev) => prev - (20 + gameLevel));
       }, 10);
 
       return () => {
         clearInterval(interval);
       };
     }
-  }, [gameOver]);
+  }, [gameOver, gameLevel]);
 
   return (
     <div className="game">
@@ -118,6 +114,7 @@ const App: FC = () => {
         ))}
         <Player position={playerPosition} />
         <Score>{score}</Score>
+        <Level>{gameLevel}</Level>
         <Timer timer={timer} />
         {gameOver && <GameOver onClick={() => setGameOver(false)} />}
       </div>
