@@ -7,24 +7,27 @@ import GameOver from "./components/game-over";
 import Timer from "./components/timer";
 import Level from "./components/level";
 import {
-  GAME_HEIGHT,
+  INITIAL_WOOD_ARRAY,
   PLAYER_POSITION,
+  TIMER_STEP_PER_CLICK_MS,
+  TIMER_MAXIMUM_MS,
+  WINDOW_HEIGHT,
+  WINDOW_WIDTH,
   WOOD_TYPE,
+  SCORE_STEP_FOR_LEVEL_UP,
+  WINDOW_CENTER_X,
+  TIMER_INTERVAL_DELAY,
+  TIMER_INTERVAL_MINUS_STEP,
 } from "./common/common.constants";
-import { addNextWood, generateWoodAtTheStart } from "./utils/common.utils";
+import { addNextWood } from "./utils/common.utils";
 import { IWood } from "./interfaces/common.interface";
 
-const initialWoodArray = generateWoodAtTheStart();
-
-// TODO: add adaptive game width depends on device
-// TODO: lost the game if go on branch directly
-
 const App: FC = () => {
-  const [timer, setTimer] = useState<number>(10000);
+  const [timer, setTimer] = useState<number>(TIMER_MAXIMUM_MS);
   const [score, setScore] = useState<number>(0);
   const [gameLevel, setGameLevel] = useState<number>(1);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [woodArray, setWoodArray] = useState<IWood[]>(initialWoodArray);
+  const [woodArray, setWoodArray] = useState<IWood[]>(INITIAL_WOOD_ARRAY);
   const [playerPosition, setPlayerPosition] = useState<
     keyof typeof PLAYER_POSITION
   >(PLAYER_POSITION.LEFT);
@@ -32,11 +35,17 @@ const App: FC = () => {
   const gameOverAndReset = () => {
     setGameOver(true);
     setScore(0);
-    setTimer(10000);
+    setTimer(TIMER_MAXIMUM_MS);
     setGameLevel(1);
-    setWoodArray(initialWoodArray);
+    setWoodArray(INITIAL_WOOD_ARRAY);
     return;
   };
+
+  // TODO: avoid using two enums and "left" | "right", create one enum GAME_SIDE for all needs
+  // TODO: display seconds in timer
+  // TODO: add textures for all items
+  // TODO: create two different functions gameOver and ResetGame
+  // TODO: user need to click on screen when first in a game to start playing
 
   const handleGameClick = useCallback(
     (side: "left" | "right") => {
@@ -45,12 +54,12 @@ const App: FC = () => {
       setPlayerPosition(
         side === "left" ? PLAYER_POSITION.LEFT : PLAYER_POSITION.RIGHT
       );
-      setScore((prev) => prev + 1);
+      setScore((prev) => ++prev);
 
-      if (timer >= 10000) return;
-      setTimer((prev) => prev + 500);
+      if (timer >= TIMER_MAXIMUM_MS) return;
+      setTimer((prev) => prev + TIMER_STEP_PER_CLICK_MS);
 
-      if (score / 10 > gameLevel) {
+      if (score / SCORE_STEP_FOR_LEVEL_UP > gameLevel) {
         setGameLevel((prev) => prev + 1);
       }
 
@@ -66,10 +75,7 @@ const App: FC = () => {
 
   const startGame = useCallback(
     (event: MouseEvent) => {
-      const windowWidth = window.innerWidth;
-      const windowCenterX = windowWidth / 2;
-
-      if (event.x <= windowCenterX) {
+      if (event.x <= WINDOW_CENTER_X) {
         handleGameClick("left");
       } else {
         handleGameClick("right");
@@ -79,42 +85,37 @@ const App: FC = () => {
   );
 
   if (timer <= 0) {
-    setGameOver(true);
-    setTimer(10000);
+    gameOverAndReset();
   }
 
   useEffect(() => {
     window.addEventListener("click", startGame);
-
-    return () => {
-      window.removeEventListener("click", startGame);
-    };
+    return () => window.removeEventListener("click", startGame);
   }, [startGame]);
 
   useEffect(() => {
     if (!gameOver) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - (20 + gameLevel));
-      }, 10);
+      const timerInterval = setInterval(() => {
+        setTimer((prev) => prev - (TIMER_INTERVAL_MINUS_STEP + gameLevel));
+      }, TIMER_INTERVAL_DELAY);
 
-      return () => {
-        clearInterval(interval);
-      };
+      return () => clearInterval(timerInterval);
     }
   }, [gameOver, gameLevel]);
 
   return (
-    <div className="game">
-      <div className="game__container" style={{ height: GAME_HEIGHT }}>
-        {woodArray.map(({ id, woodType }) => (
-          <Wood key={id} woodType={woodType} />
-        ))}
-        <Player position={playerPosition} />
-        <Score>{score}</Score>
-        <Level>{gameLevel}</Level>
-        <Timer timer={timer} />
-        {gameOver && <GameOver onClick={() => setGameOver(false)} />}
-      </div>
+    <div
+      className="game"
+      style={{ height: WINDOW_HEIGHT, width: WINDOW_WIDTH }}
+    >
+      {woodArray.map(({ id, woodType }) => (
+        <Wood key={id} woodType={woodType} />
+      ))}
+      <Player position={playerPosition} />
+      <Score>{score}</Score>
+      <Level>{gameLevel}</Level>
+      <Timer timer={timer} />
+      {gameOver && <GameOver onClick={() => setGameOver(false)} />}
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import {
-  GAME_HEIGHT,
-  WOOD_HEIGHT,
+  WOOD_COUNT,
   WOOD_TYPE,
   WOOD_TYPE_LENGTH,
 } from "../common/common.constants";
@@ -28,8 +27,6 @@ export const addNextWood = (woodArray: IWood[]) => {
 };
 
 export const generateWoodAtTheStart = () => {
-  const WOOD_COUNT = GAME_HEIGHT / WOOD_HEIGHT;
-
   const START_WOOD_ARRAY: IWood[] = [];
 
   for (let i = 0; i <= WOOD_COUNT; i++) {

@@ -1,25 +1,26 @@
 import { FC } from "react";
 
+import {
+  TIMER_HEIGHT,
+  TIMER_MAXIMUM_MS,
+  TIMER_WIDTH,
+} from "../common/common.constants";
+
 type Props = {
   timer: number;
 };
 
-const TIMER_WIDTH = 300;
-
 const Timer: FC<Props> = (props) => {
   const { timer } = props;
 
-  let left = (timer / 100) * 3;
-
-  if (left >= TIMER_WIDTH) {
-    left = TIMER_WIDTH;
-  }
+  let leftPosition = (timer / TIMER_MAXIMUM_MS) * TIMER_WIDTH;
+  if (leftPosition >= TIMER_WIDTH) leftPosition = TIMER_WIDTH;
 
   return (
-    <div className="timer" style={{ width: TIMER_WIDTH }}>
+    <div className="timer" style={{ width: TIMER_WIDTH, height: TIMER_HEIGHT }}>
       <div
         className="timer__complete-bar"
-        style={{ width: TIMER_WIDTH, left }}
+        style={{ width: TIMER_WIDTH, height: TIMER_HEIGHT, left: leftPosition }}
       ></div>
     </div>
   );

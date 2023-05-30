@@ -3,7 +3,6 @@
     top: 40px;
     left: 50%;
     transform: translateX(-50%);
-    height: 30px;
     border-radius: 6px;
     background-color: gray;
     border: 2px solid black;
@@ -13,6 +12,5 @@
 .timer__complete-bar {
     position: absolute;
     transform: translateX(-100%);
-    height: 30px;
     background-color: green;
 }

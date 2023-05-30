@@ -7,6 +7,17 @@
     background-color: aliceblue;
 }
 
+@media only screen and (min-width: 768px) {
+    .game-over {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50%;
+        background-color: aliceblue;
+    }
+}
+
 .game-over__retry-text {
     text-align: center;
     color: palevioletred;
