@@ -16,6 +16,9 @@ import { IWood } from "./interfaces/common.interface";
 
 const initialWoodArray = generateWoodAtTheStart();
 
+// TODO: add adaptive game width depends on device
+// TODO: lost the game if go on branch directly
+
 const App: FC = () => {
   const [timer, setTimer] = useState<number>(10000);
   const [score, setScore] = useState<number>(0);
@@ -32,53 +35,47 @@ const App: FC = () => {
     setTimer(10000);
     setGameLevel(1);
     setWoodArray(initialWoodArray);
-    setPlayerPosition(PLAYER_POSITION.LEFT);
     return;
   };
 
-  const handleLeftGameClick = useCallback(() => {
-    setPlayerPosition(PLAYER_POSITION.LEFT);
-    setWoodArray((prev) => prev.slice(0, -1));
-    setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
-
-    if (woodArray[woodArray.length - 2].woodType === WOOD_TYPE.LEFT) {
-      gameOverAndReset();
-    }
-    if (timer >= 10000) return;
-
-    setScore((prev) => prev + 1);
-    setTimer((prev) => prev + 500);
-  }, [woodArray, timer]);
-
-  const handleRightGameClick = useCallback(() => {
-    setPlayerPosition(PLAYER_POSITION.RIGHT);
-    setWoodArray((prev) => prev.slice(0, -1));
-    setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
-
-    if (woodArray[woodArray.length - 2].woodType === WOOD_TYPE.RIGHT) {
-      gameOverAndReset();
-    }
-    if (timer >= 10000) return;
-
-    setScore((prev) => prev + 1);
-    setTimer((prev) => prev + 500);
-  }, [woodArray, timer]);
-
   const handleGameClick = useCallback(
+    (side: "left" | "right") => {
+      setWoodArray((prev) => prev.slice(0, -1));
+      setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
+      setPlayerPosition(
+        side === "left" ? PLAYER_POSITION.LEFT : PLAYER_POSITION.RIGHT
+      );
+      setScore((prev) => prev + 1);
+
+      if (timer >= 10000) return;
+      setTimer((prev) => prev + 500);
+
+      if (score / 10 > gameLevel) {
+        setGameLevel((prev) => prev + 1);
+      }
+
+      if (
+        woodArray[woodArray.length - 2].woodType ===
+        (side === "left" ? WOOD_TYPE.LEFT : WOOD_TYPE.RIGHT)
+      ) {
+        gameOverAndReset();
+      }
+    },
+    [woodArray, timer, score, gameLevel]
+  );
+
+  const startGame = useCallback(
     (event: MouseEvent) => {
       const windowWidth = window.innerWidth;
       const windowCenterX = windowWidth / 2;
 
       if (event.x <= windowCenterX) {
-        handleLeftGameClick();
+        handleGameClick("left");
       } else {
-        handleRightGameClick();
-      }
-      if (score / 10 > gameLevel) {
-        setGameLevel((prev) => prev + 1);
+        handleGameClick("right");
       }
     },
-    [handleLeftGameClick, handleRightGameClick, score, gameLevel]
+    [handleGameClick]
   );
 
   if (timer <= 0) {
@@ -87,12 +84,12 @@ const App: FC = () => {
   }
 
   useEffect(() => {
-    window.addEventListener("click", handleGameClick);
+    window.addEventListener("click", startGame);
 
     return () => {
-      window.removeEventListener("click", handleGameClick);
+      window.removeEventListener("click", startGame);
     };
-  }, [handleGameClick]);
+  }, [startGame]);
 
   useEffect(() => {
     if (!gameOver) {
