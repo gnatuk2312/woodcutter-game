@@ -1,0 +1,27 @@
+.wood {
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-bottom: none;
+    background-color: brown;
+    position: relative;
+}
+
+.wood_left::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -100%;
+    width: 30px;
+    height: 6px;
+    background-color: brown;
+}
+
+.wood_right::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -100%;
+    width: 30px;
+    height: 6px;
+    background-color: brown;
+}

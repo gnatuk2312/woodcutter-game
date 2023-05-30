@@ -1,0 +1,16 @@
+.player {
+    position: absolute;
+    bottom: 0;
+    width: 20px;
+    height: 40px;
+    background-color: pink;
+    border: 2px solid plum;
+}
+
+.player_left {
+    left: calc(50% - 50px)
+}
+
+.player_right {
+    right: calc(50% - 50px)
+}
