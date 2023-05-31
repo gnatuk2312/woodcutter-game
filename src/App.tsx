@@ -8,19 +8,18 @@ import Timer from "./components/timer";
 import Level from "./components/level";
 import {
   INITIAL_WOOD_ARRAY,
-  PLAYER_POSITION,
   TIMER_STEP_PER_CLICK_MS,
   TIMER_MAXIMUM_MS,
   WINDOW_HEIGHT,
   WINDOW_WIDTH,
-  WOOD_TYPE,
   SCORE_STEP_FOR_LEVEL_UP,
   WINDOW_CENTER_X,
   TIMER_INTERVAL_DELAY,
   TIMER_INTERVAL_MINUS_STEP,
+  GAME_SIDE,
 } from "./common/common.constants";
 import { addNextWood } from "./utils/common.utils";
-import { IWood } from "./interfaces/common.interface";
+import { IWood, TGameSide } from "./interfaces/common.interface";
 
 const App: FC = () => {
   const [timer, setTimer] = useState<number>(TIMER_MAXIMUM_MS);
@@ -28,9 +27,9 @@ const App: FC = () => {
   const [gameLevel, setGameLevel] = useState<number>(1);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [woodArray, setWoodArray] = useState<IWood[]>(INITIAL_WOOD_ARRAY);
-  const [playerPosition, setPlayerPosition] = useState<
-    keyof typeof PLAYER_POSITION
-  >(PLAYER_POSITION.LEFT);
+  const [playerPosition, setPlayerPosition] = useState<TGameSide>(
+    GAME_SIDE.LEFT
+  );
 
   const gameOverAndReset = () => {
     setGameOver(true);
@@ -41,32 +40,26 @@ const App: FC = () => {
     return;
   };
 
-  // TODO: avoid using two enums and "left" | "right", create one enum GAME_SIDE for all needs
   // TODO: display seconds in timer
   // TODO: add textures for all items
   // TODO: create two different functions gameOver and ResetGame
   // TODO: user need to click on screen when first in a game to start playing
 
   const handleGameClick = useCallback(
-    (side: "left" | "right") => {
+    (gameSide: TGameSide) => {
       setWoodArray((prev) => prev.slice(0, -1));
       setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
-      setPlayerPosition(
-        side === "left" ? PLAYER_POSITION.LEFT : PLAYER_POSITION.RIGHT
-      );
+      setPlayerPosition(gameSide);
       setScore((prev) => ++prev);
 
       if (timer >= TIMER_MAXIMUM_MS) return;
       setTimer((prev) => prev + TIMER_STEP_PER_CLICK_MS);
 
       if (score / SCORE_STEP_FOR_LEVEL_UP > gameLevel) {
-        setGameLevel((prev) => prev + 1);
+        setGameLevel((prev) => ++prev);
       }
 
-      if (
-        woodArray[woodArray.length - 2].woodType ===
-        (side === "left" ? WOOD_TYPE.LEFT : WOOD_TYPE.RIGHT)
-      ) {
+      if (woodArray[woodArray.length - 2].woodType === gameSide) {
         gameOverAndReset();
       }
     },
@@ -76,9 +69,9 @@ const App: FC = () => {
   const startGame = useCallback(
     (event: MouseEvent) => {
       if (event.x <= WINDOW_CENTER_X) {
-        handleGameClick("left");
+        handleGameClick(GAME_SIDE.LEFT);
       } else {
-        handleGameClick("right");
+        handleGameClick(GAME_SIDE.RIGHT);
       }
     },
     [handleGameClick]

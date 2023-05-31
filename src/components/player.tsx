@@ -1,9 +1,10 @@
 import { FC } from "react";
 
-import { PLAYER_POSITION } from "../common/common.constants";
+import { GAME_SIDE } from "../common/common.constants";
+import { TGameSide } from "../interfaces/common.interface";
 
 type Props = {
-  position: keyof typeof PLAYER_POSITION;
+  position: TGameSide;
 };
 
 const Player: FC<Props> = (props) => {
@@ -11,8 +12,8 @@ const Player: FC<Props> = (props) => {
 
   const classNames = ["player"];
 
-  if (position === PLAYER_POSITION.LEFT) classNames.push("player_left");
-  if (position === PLAYER_POSITION.RIGHT) classNames.push("player_right");
+  if (position === GAME_SIDE.LEFT) classNames.push("player_left");
+  if (position === GAME_SIDE.RIGHT) classNames.push("player_right");
 
   return <div className={classNames.join(" ")}></div>;
 };

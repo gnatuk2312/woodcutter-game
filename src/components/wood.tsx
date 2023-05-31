@@ -1,9 +1,10 @@
 import { FC } from "react";
 
-import { WOOD_HEIGHT, WOOD_TYPE, WOOD_WIDTH } from "../common/common.constants";
+import { GAME_SIDE, WOOD_HEIGHT, WOOD_WIDTH } from "../common/common.constants";
+import { TWoodType } from "../interfaces/common.interface";
 
 type Props = {
-  woodType: keyof typeof WOOD_TYPE;
+  woodType: TWoodType;
 };
 
 const Wood: FC<Props> = (props) => {
@@ -11,8 +12,8 @@ const Wood: FC<Props> = (props) => {
 
   const classNames = ["wood"];
 
-  if (woodType === WOOD_TYPE.LEFT) classNames.push("wood_left");
-  if (woodType === WOOD_TYPE.RIGHT) classNames.push("wood_right");
+  if (woodType === GAME_SIDE.LEFT) classNames.push("wood_left");
+  if (woodType === GAME_SIDE.RIGHT) classNames.push("wood_right");
 
   return (
     <div

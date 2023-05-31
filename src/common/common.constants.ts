@@ -1,13 +1,6 @@
 import { generateWoodAtTheStart } from "../utils/common.utils";
 
-export enum WOOD_TYPE {
-  LEFT = "LEFT",
-  RIGHT = "RIGHT",
-  NONE = "NONE",
-}
-export const WOOD_TYPE_LENGTH = 3;
-
-export enum PLAYER_POSITION {
+export enum GAME_SIDE {
   LEFT = "LEFT",
   RIGHT = "RIGHT",
 }
