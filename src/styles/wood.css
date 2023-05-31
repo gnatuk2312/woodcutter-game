@@ -1,27 +1,16 @@
 .wood {
-    box-sizing: border-box;
-    border: 2px solid black;
-    border-bottom: none;
-    background-color: brown;
+    background-image: url(../../public/wood-null.png);
+    background-repeat: no-repeat;
+    background-position-x: center;
     position: relative;
 }
 
-.wood_left::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: -100%;
-    width: 30px;
-    height: 6px;
-    background-color: brown;
+.wood_left {
+    background-image: url(../../public/wood-left.png);
+    background-position-x: left;
 }
 
-.wood_right::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: -100%;
-    width: 30px;
-    height: 6px;
-    background-color: brown;
+.wood_right {
+    background-image: url(../../public/wood-right.png);
+    background-position-x: right;
 }

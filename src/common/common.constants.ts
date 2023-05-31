@@ -9,8 +9,8 @@ export const WINDOW_HEIGHT = window.innerHeight;
 export const WINDOW_WIDTH = window.innerWidth;
 export const WINDOW_CENTER_X = window.innerWidth / 2;
 
-export const WOOD_WIDTH = 40;
-export const WOOD_HEIGHT = 40;
+export const WOOD_WIDTH = 344; // sum of wood textures width
+export const WOOD_HEIGHT = 100;
 export const WOOD_COUNT = Math.floor(WINDOW_HEIGHT / WOOD_HEIGHT);
 export const INITIAL_WOOD_ARRAY = generateWoodAtTheStart();
 

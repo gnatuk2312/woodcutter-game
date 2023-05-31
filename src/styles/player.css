@@ -1,16 +1,32 @@
 .player {
     position: absolute;
-    bottom: 0;
-    width: 20px;
-    height: 40px;
-    background-color: pink;
-    border: 2px solid plum;
+    bottom: -10px;
+    width: 92px;
+    height: 134px;
 }
 
 .player_left {
-    left: calc(50% - 50px)
+    background-image: url(../../public/woodcutter-left-sprite-1.png);
+    left: calc(50% - 134px);
 }
 
 .player_right {
-    right: calc(50% - 50px)
+    background-image: url(../../public/woodcutter-right-sprite-1.png);
+    right: calc(50% - 134px);
+}
+
+.player_animated.player_left {
+    background-image: url(../../public/woodcutter-left-sprite-2.png);
+}
+
+.player_animated.player_right {
+    background-image: url(../../public/woodcutter-right-sprite-2.png);
+}
+
+.player_game-over.player_left {
+    transform: rotateZ(-120deg);
+}
+
+.player_game-over.player_right {
+    transform: rotateZ(90deg);
 }

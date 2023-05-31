@@ -50,6 +50,16 @@ const App: FC = () => {
   const handleMainGameAction = useCallback(
     (gameSide: TGameSide) => {
       if (isGameOver) return;
+      if (woodArray[woodArray.length - 2].woodType === gameSide) {
+        setPlayerPosition(gameSide);
+        setTimeout(() => gameOver(), 10); // need to be executed after setPlayerPosition()
+        return;
+      }
+      if (woodArray[woodArray.length - 1].woodType === gameSide) {
+        setPlayerPosition(gameSide);
+        setTimeout(() => gameOver(), 10); // need to be executed after setPlayerPosition()
+        return;
+      }
 
       setWoodArray((prev) => prev.slice(0, -1));
       setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
@@ -61,9 +71,6 @@ const App: FC = () => {
 
       if (score / SCORE_STEP_FOR_LEVEL_UP > gameLevel)
         setGameLevel((prev) => ++prev);
-
-      if (woodArray[woodArray.length - 2].woodType === gameSide) gameOver();
-      if (woodArray[woodArray.length - 1].woodType === gameSide) gameOver();
     },
     [isGameOver, woodArray, timer, score, gameLevel]
   );
@@ -118,7 +125,7 @@ const App: FC = () => {
       {woodArray.map(({ id, woodType }) => (
         <Wood key={id} woodType={woodType} />
       ))}
-      <Player position={playerPosition} />
+      <Player position={playerPosition} score={score} />
       <Score>{score}</Score>
       <Level>{gameLevel}</Level>
       <Timer timer={timer} />
