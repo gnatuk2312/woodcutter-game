@@ -47,7 +47,7 @@ const App: FC = () => {
   // TODO: add textures for all items
   // TODO: user need to click on screen when first in a game to start playing
 
-  const handleGameClick = useCallback(
+  const handleMainGameAction = useCallback(
     (gameSide: TGameSide) => {
       if (isGameOver) return;
 
@@ -68,21 +68,33 @@ const App: FC = () => {
     [isGameOver, woodArray, timer, score, gameLevel]
   );
 
-  const startGame = useCallback(
+  const handleGameClickEventListener = useCallback(
     (event: MouseEvent) => {
       if (event.x <= WINDOW_CENTER_X) {
-        handleGameClick(GAME_SIDE.LEFT);
+        handleMainGameAction(GAME_SIDE.LEFT);
       } else {
-        handleGameClick(GAME_SIDE.RIGHT);
+        handleMainGameAction(GAME_SIDE.RIGHT);
       }
     },
-    [handleGameClick]
+    [handleMainGameAction]
+  );
+
+  const handleGameKeydownEventListener = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") handleMainGameAction(GAME_SIDE.RIGHT);
+      if (event.key === "ArrowLeft") handleMainGameAction(GAME_SIDE.LEFT);
+    },
+    [handleMainGameAction]
   );
 
   useEffect(() => {
-    window.addEventListener("click", startGame);
-    return () => window.removeEventListener("click", startGame);
-  }, [startGame]);
+    document.addEventListener("click", handleGameClickEventListener);
+    document.addEventListener("keydown", handleGameKeydownEventListener);
+    return () => {
+      document.removeEventListener("click", handleGameClickEventListener);
+      document.removeEventListener("keydown", handleGameKeydownEventListener);
+    };
+  }, [handleGameClickEventListener, handleGameKeydownEventListener]);
 
   useEffect(() => {
     if (!isGameOver) {
