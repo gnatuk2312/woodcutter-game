@@ -25,28 +25,32 @@ const App: FC = () => {
   const [timer, setTimer] = useState<number>(TIMER_MAXIMUM_MS);
   const [score, setScore] = useState<number>(0);
   const [gameLevel, setGameLevel] = useState<number>(1);
-  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [woodArray, setWoodArray] = useState<IWood[]>(INITIAL_WOOD_ARRAY);
   const [playerPosition, setPlayerPosition] = useState<TGameSide>(
     GAME_SIDE.LEFT
   );
 
-  const gameOverAndReset = () => {
-    setGameOver(true);
+  const gameOver = () => {
+    setIsGameOver(true);
+  };
+
+  const gameReset = () => {
     setScore(0);
-    setTimer(TIMER_MAXIMUM_MS);
     setGameLevel(1);
+    setTimer(TIMER_MAXIMUM_MS);
     setWoodArray(INITIAL_WOOD_ARRAY);
-    return;
+    setIsGameOver(false);
   };
 
   // TODO: display seconds in timer
   // TODO: add textures for all items
-  // TODO: create two different functions gameOver and ResetGame
   // TODO: user need to click on screen when first in a game to start playing
 
   const handleGameClick = useCallback(
     (gameSide: TGameSide) => {
+      if (isGameOver) return;
+
       setWoodArray((prev) => prev.slice(0, -1));
       setWoodArray((prev) => [addNextWood(woodArray), ...prev]);
       setPlayerPosition(gameSide);
@@ -55,15 +59,13 @@ const App: FC = () => {
       if (timer >= TIMER_MAXIMUM_MS) return;
       setTimer((prev) => prev + TIMER_STEP_PER_CLICK_MS);
 
-      if (score / SCORE_STEP_FOR_LEVEL_UP > gameLevel) {
+      if (score / SCORE_STEP_FOR_LEVEL_UP > gameLevel)
         setGameLevel((prev) => ++prev);
-      }
 
-      if (woodArray[woodArray.length - 2].woodType === gameSide) {
-        gameOverAndReset();
-      }
+      if (woodArray[woodArray.length - 2].woodType === gameSide) gameOver();
+      if (woodArray[woodArray.length - 1].woodType === gameSide) gameOver();
     },
-    [woodArray, timer, score, gameLevel]
+    [isGameOver, woodArray, timer, score, gameLevel]
   );
 
   const startGame = useCallback(
@@ -77,24 +79,24 @@ const App: FC = () => {
     [handleGameClick]
   );
 
-  if (timer <= 0) {
-    gameOverAndReset();
-  }
-
   useEffect(() => {
     window.addEventListener("click", startGame);
     return () => window.removeEventListener("click", startGame);
   }, [startGame]);
 
   useEffect(() => {
-    if (!gameOver) {
+    if (!isGameOver) {
       const timerInterval = setInterval(() => {
         setTimer((prev) => prev - (TIMER_INTERVAL_MINUS_STEP + gameLevel));
       }, TIMER_INTERVAL_DELAY);
 
       return () => clearInterval(timerInterval);
     }
-  }, [gameOver, gameLevel]);
+  }, [isGameOver, gameLevel]);
+
+  useEffect(() => {
+    if (timer <= 0) gameOver();
+  }, [timer]);
 
   return (
     <div
@@ -108,7 +110,7 @@ const App: FC = () => {
       <Score>{score}</Score>
       <Level>{gameLevel}</Level>
       <Timer timer={timer} />
-      {gameOver && <GameOver onClick={() => setGameOver(false)} />}
+      {isGameOver && <GameOver onClick={gameReset} />}
     </div>
   );
 };
